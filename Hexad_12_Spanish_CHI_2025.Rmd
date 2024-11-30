@@ -1,24 +1,36 @@
 ---
-title: "Hexad-12_Spanish_CHI_2025"
-output: html_document
-date: "2024-11-29"
+title: "README"
+output: 
+  github_document:
+    pandoc_args: ["--wrap=none"]
+always_allow_html: true
 ---
 
 ```{r setup}
 knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
+
+```
+
+```{r}
 # Load required libraries
-library(knitr)
-library(dplyr)
-library(ggplot2)
-library(tidyr)
-library(multcomp)
-library(kableExtra)
-library(FSA)
-library(MVN)
-library(lavaan)
-library(semPlot)
-library(psych)  # For Cronbach's alpha
-library(boot)   # For bootstrapping confidence intervals
+# List of libraries to check, install (if missing), and load
+libraries <- c(
+  "knitr", "dplyr", "ggplot2", "tidyr", "multcomp", 
+  "kableExtra", "FSA", "MVN", "lavaan", "semPlot", 
+  "psych", "boot", "markdown"
+)
+
+# Function to check, install, and load libraries
+check_and_load <- function(lib) {
+  if (!require(lib, character.only = TRUE)) {
+    install.packages(lib, dependencies = TRUE)
+    library(lib, character.only = TRUE)
+  }
+}
+
+# Apply the function to all libraries
+lapply(libraries, check_and_load)
+
 set.seed(123)  # For reproducibility
 
 
@@ -520,7 +532,7 @@ reliability_metrics <- semTools::reliability(fit)
 
 # Perform bootstrap sampling
 set.seed(123)  # For reproducibility
-num_bootstrap <- 10000  # Number of bootstrap samples8u-p0
+num_bootstrap <- 10  # Number of bootstrap samples8u-p0
 
 # Initialize matrix to store CR, Omega, and AVE
 fit_metrics <- matrix(NA, nrow = num_bootstrap, ncol = 17)
@@ -598,7 +610,7 @@ pairs <- list(
 
 
 
-num_bootstrap <- 10000
+num_bootstrap <- 10
 # Define function for Cronbach's alpha calculation
 cronbach_alpha_fn <- function(data, indices, item1, item2) {
   sample_data <- data[indices, c(item1, item2)]
