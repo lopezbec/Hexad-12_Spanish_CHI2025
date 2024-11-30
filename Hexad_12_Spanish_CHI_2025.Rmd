@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
 
 ```
 
-```{r}
+```{r,warning = FALSE, message = FALSE, echo=FALSE, include=FALSE}
 # Load required libraries
 # List of libraries to check, install (if missing), and load
 libraries <- c(
@@ -532,7 +532,7 @@ reliability_metrics <- semTools::reliability(fit)
 
 # Perform bootstrap sampling
 set.seed(123)  # For reproducibility
-num_bootstrap <- 10  # Number of bootstrap samples8u-p0
+num_bootstrap <- 10000  # Number of bootstrap samples8u-p0
 
 # Initialize matrix to store CR, Omega, and AVE
 fit_metrics <- matrix(NA, nrow = num_bootstrap, ncol = 17)
@@ -610,7 +610,7 @@ pairs <- list(
 
 
 
-num_bootstrap <- 10
+num_bootstrap <- 10000
 # Define function for Cronbach's alpha calculation
 cronbach_alpha_fn <- function(data, indices, item1, item2) {
   sample_data <- data[indices, c(item1, item2)]
@@ -674,9 +674,6 @@ results %>%
 ```
 ## Correlaiton matric Kendals Tau
 ```{r}
-library(dplyr)
-library(knitr)
-library(kableExtra)
 
 # Reorganize columns in the desired order
 columns <- c("philanthropist", "socializer", "achiever", "player", "disruptor", "freeSpirit")

@@ -5,70 +5,6 @@ README
 knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
 ```
 
-``` r
-# Load required libraries
-# List of libraries to check, install (if missing), and load
-libraries <- c(
-  "knitr", "dplyr", "ggplot2", "tidyr", "multcomp", 
-  "kableExtra", "FSA", "MVN", "lavaan", "semPlot", 
-  "psych", "boot", "markdown"
-)
-
-# Function to check, install, and load libraries
-check_and_load <- function(lib) {
-  if (!require(lib, character.only = TRUE)) {
-    install.packages(lib, dependencies = TRUE)
-    library(lib, character.only = TRUE)
-  }
-}
-
-# Apply the function to all libraries
-lapply(libraries, check_and_load)
-```
-
-    ## [[1]]
-    ## NULL
-    ## 
-    ## [[2]]
-    ## NULL
-    ## 
-    ## [[3]]
-    ## NULL
-    ## 
-    ## [[4]]
-    ## NULL
-    ## 
-    ## [[5]]
-    ## NULL
-    ## 
-    ## [[6]]
-    ## NULL
-    ## 
-    ## [[7]]
-    ## NULL
-    ## 
-    ## [[8]]
-    ## NULL
-    ## 
-    ## [[9]]
-    ## NULL
-    ## 
-    ## [[10]]
-    ## NULL
-    ## 
-    ## [[11]]
-    ## NULL
-    ## 
-    ## [[12]]
-    ## NULL
-    ## 
-    ## [[13]]
-    ## NULL
-
-``` r
-set.seed(123)  # For reproducibility
-```
-
 Download that from GitHub Repo: <https://github.com/lopezbec/Hexad-12_Spanish_CHI2025>
 
 ``` r
@@ -2703,7 +2639,7 @@ reliability_metrics <- semTools::reliability(fit)
 
 # Perform bootstrap sampling
 set.seed(123)  # For reproducibility
-num_bootstrap <- 10  # Number of bootstrap samples8u-p0
+num_bootstrap <- 10000  # Number of bootstrap samples8u-p0
 
 # Initialize matrix to store CR, Omega, and AVE
 fit_metrics <- matrix(NA, nrow = num_bootstrap, ncol = 17)
@@ -2778,10 +2714,10 @@ chisq.scaled
 77.320
 </td>
 <td style="text-align:right;">
-73.623
+69.545
 </td>
 <td style="text-align:right;">
-130.840
+141.811
 </td>
 </tr>
 <tr>
@@ -2792,7 +2728,7 @@ srmr
 0.026
 </td>
 <td style="text-align:right;">
-0.026
+0.024
 </td>
 <td style="text-align:right;">
 0.037
@@ -2806,10 +2742,10 @@ tli.scaled
 0.914
 </td>
 <td style="text-align:right;">
-0.757
+0.766
 </td>
 <td style="text-align:right;">
-0.919
+0.933
 </td>
 </tr>
 <tr>
@@ -2820,10 +2756,10 @@ cfi.scaled
 0.949
 </td>
 <td style="text-align:right;">
-0.857
+0.862
 </td>
 <td style="text-align:right;">
-0.952
+0.960
 </td>
 </tr>
 <tr>
@@ -2834,10 +2770,10 @@ rmsea.scaled
 0.034
 </td>
 <td style="text-align:right;">
-0.032
+0.030
 </td>
 <td style="text-align:right;">
-0.052
+0.055
 </td>
 </tr>
 <tr>
@@ -2848,10 +2784,10 @@ CR.Achiever
 0.619
 </td>
 <td style="text-align:right;">
-0.574
+0.524
 </td>
 <td style="text-align:right;">
-0.665
+0.698
 </td>
 </tr>
 <tr>
@@ -2862,7 +2798,7 @@ CR.Disruptor
 0.738
 </td>
 <td style="text-align:right;">
-0.684
+0.693
 </td>
 <td style="text-align:right;">
 0.817
@@ -2876,10 +2812,10 @@ CR.FreeSpirit
 0.740
 </td>
 <td style="text-align:right;">
-0.653
+0.665
 </td>
 <td style="text-align:right;">
-0.773
+0.800
 </td>
 </tr>
 <tr>
@@ -2890,10 +2826,10 @@ CR.Philanthropist
 0.758
 </td>
 <td style="text-align:right;">
-0.718
+0.693
 </td>
 <td style="text-align:right;">
-0.780
+0.813
 </td>
 </tr>
 <tr>
@@ -2904,10 +2840,10 @@ CR.Player
 0.674
 </td>
 <td style="text-align:right;">
-0.628
+0.611
 </td>
 <td style="text-align:right;">
-0.727
+0.731
 </td>
 </tr>
 <tr>
@@ -2918,10 +2854,10 @@ CR.Socializer
 0.802
 </td>
 <td style="text-align:right;">
-0.779
+0.759
 </td>
 <td style="text-align:right;">
-0.828
+0.841
 </td>
 </tr>
 <tr>
@@ -2932,10 +2868,10 @@ AVE.Achiever
 0.448
 </td>
 <td style="text-align:right;">
-0.403
+0.356
 </td>
 <td style="text-align:right;">
-0.499
+0.537
 </td>
 </tr>
 <tr>
@@ -2946,10 +2882,10 @@ AVE.Disruptor
 0.589
 </td>
 <td style="text-align:right;">
-0.521
+0.532
 </td>
 <td style="text-align:right;">
-0.719
+0.711
 </td>
 </tr>
 <tr>
@@ -2960,10 +2896,10 @@ AVE.FreeSpirit
 0.587
 </td>
 <td style="text-align:right;">
-0.486
+0.499
 </td>
 <td style="text-align:right;">
-0.631
+0.667
 </td>
 </tr>
 <tr>
@@ -2974,10 +2910,10 @@ AVE.Philanthropist
 0.611
 </td>
 <td style="text-align:right;">
-0.560
+0.531
 </td>
 <td style="text-align:right;">
-0.639
+0.685
 </td>
 </tr>
 <tr>
@@ -2988,10 +2924,10 @@ AVE.Player
 0.509
 </td>
 <td style="text-align:right;">
-0.459
+0.441
 </td>
 <td style="text-align:right;">
-0.572
+0.576
 </td>
 </tr>
 <tr>
@@ -3002,10 +2938,10 @@ AVE.Socializer
 0.670
 </td>
 <td style="text-align:right;">
-0.638
+0.612
 </td>
 <td style="text-align:right;">
-0.706
+0.725
 </td>
 </tr>
 </tbody>
@@ -3103,7 +3039,7 @@ pairs <- list(
 
 
 
-num_bootstrap <- 10
+num_bootstrap <- 10000
 # Define function for Cronbach's alpha calculation
 cronbach_alpha_fn <- function(data, indices, item1, item2) {
   sample_data <- data[indices, c(item1, item2)]
@@ -3155,19 +3091,19 @@ print(results)
 ```
 
     ##    Pair Alpha_Estimate Alpha_CI_Lower Alpha_CI_Upper Spearman_Brown_Estimate
-    ## 1 P1_P4           0.76           0.72           0.82                    0.76
-    ## 2 S2_S4           0.80           0.76           0.83                    0.80
-    ## 3 A2_A4           0.62           0.52           0.64                    0.63
-    ## 4 R2_R4           0.67           0.64           0.73                    0.68
-    ## 5 D3_D4           0.72           0.70           0.75                    0.72
-    ## 6 F1_F3           0.74           0.69           0.81                    0.74
+    ## 1 P1_P4           0.76           0.69           0.81                    0.76
+    ## 2 S2_S4           0.80           0.76           0.84                    0.80
+    ## 3 A2_A4           0.62           0.52           0.70                    0.63
+    ## 4 R2_R4           0.67           0.61           0.73                    0.68
+    ## 5 D3_D4           0.72           0.68           0.76                    0.72
+    ## 6 F1_F3           0.74           0.67           0.80                    0.74
     ##   SB_CI_Lower SB_CI_Upper
-    ## 1        0.68        0.80
-    ## 2        0.75        0.84
-    ## 3        0.55        0.69
-    ## 4        0.61        0.72
-    ## 5        0.67        0.77
-    ## 6        0.68        0.77
+    ## 1        0.70        0.81
+    ## 2        0.76        0.84
+    ## 3        0.54        0.71
+    ## 4        0.61        0.73
+    ## 5        0.68        0.76
+    ## 6        0.67        0.80
 
 ``` r
 # Define row names
@@ -3226,19 +3162,19 @@ P1_P4
 0.76
 </td>
 <td style="text-align:right;">
-0.72
+0.69
 </td>
 <td style="text-align:right;">
-0.82
+0.81
 </td>
 <td style="text-align:right;">
 0.76
 </td>
 <td style="text-align:right;">
-0.68
+0.70
 </td>
 <td style="text-align:right;">
-0.80
+0.81
 </td>
 </tr>
 <tr>
@@ -3255,13 +3191,13 @@ S2_S4
 0.76
 </td>
 <td style="text-align:right;">
-0.83
+0.84
 </td>
 <td style="text-align:right;">
 0.80
 </td>
 <td style="text-align:right;">
-0.75
+0.76
 </td>
 <td style="text-align:right;">
 0.84
@@ -3281,16 +3217,16 @@ A2_A4
 0.52
 </td>
 <td style="text-align:right;">
-0.64
+0.70
 </td>
 <td style="text-align:right;">
 0.63
 </td>
 <td style="text-align:right;">
-0.55
+0.54
 </td>
 <td style="text-align:right;">
-0.69
+0.71
 </td>
 </tr>
 <tr>
@@ -3304,7 +3240,7 @@ R2_R4
 0.67
 </td>
 <td style="text-align:right;">
-0.64
+0.61
 </td>
 <td style="text-align:right;">
 0.73
@@ -3316,7 +3252,7 @@ R2_R4
 0.61
 </td>
 <td style="text-align:right;">
-0.72
+0.73
 </td>
 </tr>
 <tr>
@@ -3330,19 +3266,19 @@ D3_D4
 0.72
 </td>
 <td style="text-align:right;">
-0.70
+0.68
 </td>
 <td style="text-align:right;">
-0.75
+0.76
 </td>
 <td style="text-align:right;">
 0.72
 </td>
 <td style="text-align:right;">
-0.67
+0.68
 </td>
 <td style="text-align:right;">
-0.77
+0.76
 </td>
 </tr>
 <tr>
@@ -3356,19 +3292,19 @@ F1_F3
 0.74
 </td>
 <td style="text-align:right;">
-0.69
+0.67
 </td>
 <td style="text-align:right;">
-0.81
+0.80
 </td>
 <td style="text-align:right;">
 0.74
 </td>
 <td style="text-align:right;">
-0.68
+0.67
 </td>
 <td style="text-align:right;">
-0.77
+0.80
 </td>
 </tr>
 </tbody>
