@@ -17,13 +17,13 @@ local_file <- tempfile(fileext = ".csv")
 # Download the file
 download.file(github_url, local_file)
 
-# Load the CSV into a dataframe
+# Load the CSV into a data frame
 data <- read.csv(local_file,row.names = 1)
 
-#remove 1st non-value colums
+#remove 1st non-value columns
 
 
-# Display the first few rows of the dataframe
+# Display the first few rows of the data frame
 head(data)
 ```
 
@@ -2658,8 +2658,7 @@ for (i in 1:num_bootstrap) {
 
 
   names(fit_measures_final) <- columns_to_ci
-  #summary(fit, fit.measures = TRUE, standardized = TRUE, rsquare = TRUE)
-  
+
 
 # Initialize an empty data frame to store the results
 results_table <- data.frame(
@@ -3086,26 +3085,6 @@ for (pair in pairs) {
   ))
 }
 
-# Print the results
-print(results)
-```
-
-    ##    Pair Alpha_Estimate Alpha_CI_Lower Alpha_CI_Upper Spearman_Brown_Estimate
-    ## 1 P1_P4           0.76           0.69           0.81                    0.76
-    ## 2 S2_S4           0.80           0.76           0.84                    0.80
-    ## 3 A2_A4           0.62           0.52           0.70                    0.63
-    ## 4 R2_R4           0.67           0.61           0.73                    0.68
-    ## 5 D3_D4           0.72           0.68           0.76                    0.72
-    ## 6 F1_F3           0.74           0.67           0.80                    0.74
-    ##   SB_CI_Lower SB_CI_Upper
-    ## 1        0.70        0.81
-    ## 2        0.76        0.84
-    ## 3        0.54        0.71
-    ## 4        0.61        0.73
-    ## 5        0.68        0.76
-    ## 6        0.67        0.80
-
-``` r
 # Define row names
 row_names <- c("Philanthropist", "Socializer", "Achiever", "Player", "Disruptor", "Free Spirit")
 
@@ -3310,13 +3289,9 @@ F1_F3
 </tbody>
 </table>
 
-## Correlaiton matric Kendals Tau
+## Correlaiton metric Kendals Tau
 
 ``` r
-library(dplyr)
-library(knitr)
-library(kableExtra)
-
 # Reorganize columns in the desired order
 columns <- c("philanthropist", "socializer", "achiever", "player", "disruptor", "freeSpirit")
 data_subset <- data[columns]
