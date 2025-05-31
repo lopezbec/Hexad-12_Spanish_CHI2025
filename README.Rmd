@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
 libraries <- c(
   "knitr", "dplyr", "ggplot2", "tidyr", "multcomp", 
   "kableExtra", "FSA", "MVN", "lavaan", "semPlot", 
-  "psych", "boot", "markdown"
+  "psych", "boot", "markdown","moments","tidyverse","gghalves"
 )
 
 # Function to check, install, and load libraries
@@ -37,21 +37,21 @@ set.seed(123)  # For reproducibility
 ```
 
 
-Download that from GitHub Repo: https://github.com/lopezbec/Hexad-12_Spanish_CHI2025
+Download that from GitHub Repo: https://github.com/
 
 ```{r}
 # Define the GitHub raw CSV URL
-github_url <- "https://raw.githubusercontent.com/lopezbec/Hexad-12_Spanish_CHI2025/refs/heads/main/Hexad_12_Spanish_data.csv"
+#github_url <- "https://raw.githubusercontent.com//Hexad-/refs/heads/main/Hexad_12_Spanish_data.csv"
 
 # Define a local file path to save the downloaded file
-local_file <- tempfile(fileext = ".csv")
+#local_file <- tempfile(fileext = ".csv")
 
 # Download the file
-download.file(github_url, local_file)
+#download.file(github_url, local_file)
 
 # Load the CSV into a data frame
-data <- read.csv(local_file,row.names = 1)
-
+#data <- read.csv(local_file,row.names = 1)
+data<-read.csv("Hexad_12_Spanish_data.csv")
 #remove 1st non-value columns
 
 
@@ -217,7 +217,11 @@ kable(summary_table, caption = "Summary of Country Distribution with Totals at t
 
 
 #### Hexad type  Distribution
+
+
 ```{r}
+
+
 # Subset data to include the first six columns
 subdata <- data[, c(1:6)]
 
@@ -229,18 +233,73 @@ colnames(subdata) <- columns_of_interest
 
 # Calculate summary statistics and round to 2 decimal places
 summary_stats <- data.frame(
-  Column = columns_of_interest,
-  Mean = round(sapply(subdata, mean, na.rm = TRUE), 2),
-  Median = round(sapply(subdata, median, na.rm = TRUE), 2),
-  Min = round(sapply(subdata, min, na.rm = TRUE), 2),
-  Max = round(sapply(subdata, max, na.rm = TRUE), 2),
-  SD = round(sapply(subdata, sd, na.rm = TRUE), 2)
+  Column   = columns_of_interest,
+  Mean     = round(sapply(subdata[columns_of_interest], mean,      na.rm = TRUE), 2),
+  Median   = round(sapply(subdata[columns_of_interest], median,    na.rm = TRUE), 2),
+  Min      = round(sapply(subdata[columns_of_interest], min,       na.rm = TRUE), 2),
+  Max      = round(sapply(subdata[columns_of_interest], max,       na.rm = TRUE), 2),
+  SD       = round(sapply(subdata[columns_of_interest], sd,        na.rm = TRUE), 2),
+  Skewness = round(sapply(subdata[columns_of_interest], skewness,  na.rm = TRUE), 2),
+  Kurtosis = round(sapply(subdata[columns_of_interest], kurtosis,  na.rm = TRUE), 2)
 )
 
-summary_stats <- summary_stats[order(-summary_stats$Mean), -1]
+# Sort by descending Mean
+summary_stats <- summary_stats[order(-summary_stats$Mean), ]
 
-# Display the summary statistics table
-kable(summary_stats, caption = "Summary Statistics for Hexad Types")
+# Print the table nicely with knitr::kable
+kable(summary_stats, 
+      caption = "Summary Statistics of Hexad-12 determinants", 
+      digits  = 2)
+
+
+```
+
+
+
+```{r}
+
+library(tidyverse)
+library(gghalves)
+library(dplyr)
+# ---- reshape to long form ---------------------------------------------------
+hexad_long <- data %>% 
+  dplyr::select(
+    Philanthropist = 'philanthropist',
+    Socializer     = 'socializer',
+    `Free Spirit`  = 'freeSpirit',
+    Achiever       = 'achiever',
+    Player         = 'player',
+    Disruptor      = 'disruptor'
+  ) %>% 
+  pivot_longer(
+    cols      = everything(),
+    names_to  = "Determinant",
+    values_to = "Score"
+  ) %>% 
+  mutate(
+    Determinant = fct_reorder(Determinant, Score, .fun = mean, .desc = TRUE)
+  )
+
+# ---- full violin + slim boxplot + jittered points --------------------------
+ggplot(hexad_long, aes(x = Determinant, y = Score, fill = Determinant)) +
+  # wider violin
+  geom_violin(trim = FALSE, width = 1.0, alpha = 0.6) +
+  # ultra-thin box in the center
+  geom_boxplot(width = 0.08, fill = "white", outlier.shape = NA) +
+  # jittered raw points
+  geom_jitter(aes(color = Determinant+1),
+              width = 0.1, height = 0.1,
+              size = 1, alpha = 0.2,
+              show.legend = FALSE) +
+  scale_y_continuous(limits = c(1, 14), breaks = seq(2, 14, 2)) +
+  guides(fill = FALSE) +
+  labs(
+    title = "Distribution of Hexad Motivational Determinants",
+    x     = NULL,
+    y     = "Score (0–14)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.major.x = element_blank())
 
 
 ```
@@ -486,7 +545,19 @@ fit <- cfa(cfa_model, data = data,std.lv=TRUE, auto.efa = TRUE, estimator = "WLS
 results<-summary(fit, fit.measures = TRUE, standardized = TRUE, rsquare = TRUE)
 
 
-results$pe[1:12, c(1:8,10)]
+
+
+# install.packages("kableExtra")  # if you haven’t already
+
+kable(
+  results$pe[1:12, c(2:8, 10)],
+  caption = "Estimated factor loading for Hexad-12 items",
+  digits  = 3,
+  format = "html"
+) %>%
+  kable_styling(full_width = TRUE) %>%
+  column_spec(1:ncol(results$pe[1:12, c(2:8, 10)]), width = "2cm")
+
 
 
 ```
@@ -573,7 +644,7 @@ for (i in seq_along(columns_to_ci)) {
 
 # Correctly print the table in a nicely formatted way
 results_table %>%
-  kbl(caption = "CFA  metrics with confident interval", format = "markdown") %>%
+  kbl(caption = "CFA  metrics with confident interval", format = "markdown",digits  = 2) %>%
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -582,93 +653,118 @@ results_table %>%
 ```{r}
 # Local Fit: Residuals  Standardized residuals
 standardized_residuals <- residuals(fit, type = "standardized")
-print(standardized_residuals)
+
+
+kable(standardized_residuals, caption = "Standardized Residuals for the Hexad-12 items from the CFA",digits  = 3)
+
 ```
 
 #### CFA Correlation residuals
 ```{r}
 #Correlation residuals
-residuals(fit, type = "cor")
+
+
+kable(residuals(fit, type = "cor"), caption = "Correlation Residuals for the Hexad-12 items from the CFA",digits  = 3)
+
 ```
 
 
 ## Internal Reliability
 
 ```{r}
+# Load necessary libraries
+library(psych)  # For Cronbach's alpha and McDonald's omega
+library(boot)   # For bootstrapping confidence intervals
 
-
-# Define pairs of columns for which to calculate Cronbach's alpha and Spearman-Brown reliability
+# Define pairs of columns for which to calculate reliability metrics
 pairs <- list(
-  c("P1", "P4"),
-   c("S2", "S4"),
   c("A2", "A4"),
-    c("R2", "R4"),
   c("D3", "D4"),
-   c("F1", "F3")
-   )
+  c("F1", "F3"),
+  c("P1", "P4"),
+  c("R2", "R4"),
+  c("S2", "S4")
+)
 
 
-
-num_bootstrap <- 10000
-# Define function for Cronbach's alpha calculation
+merged_hexad<-data
+# Cronbach's alpha function
 cronbach_alpha_fn <- function(data, indices, item1, item2) {
-  sample_data <- data[indices, c(item1, item2)]
-  alpha <- psych::alpha(sample_data)$total$raw_alpha
-  return(alpha)
+  samp <- data[indices, c(item1, item2)]
+  psych::alpha(samp)$total$raw_alpha
 }
 
-# Define function for Spearman-Brown calculation
+# Spearman-Brown function
 spearman_brown_fn <- function(data, indices, item1, item2) {
-  sample_data <- data[indices, ]
-  correlation <- cor(sample_data[[item1]], sample_data[[item2]], method = "pearson")
-  spearman_brown <- 2 * correlation / (1 + correlation)
-  return(spearman_brown)
+  samp <- data[indices, ]
+  r <- cor(samp[[item1]], samp[[item2]], method = "pearson", use = "pairwise.complete.obs")
+  2 * r / (1 + r)
 }
 
-# Initialize a data frame to store results
-results <- data.frame(Pair = character(), Alpha_Estimate = numeric(), Alpha_CI_Lower = numeric(), Alpha_CI_Upper = numeric(),
-                      Spearman_Brown_Estimate = numeric(), SB_CI_Lower = numeric(), SB_CI_Upper = numeric())
+# McDonald's omega function
+mcdonald_omega_fn <- function(data, indices, item1, item2) {
+  samp <- data[indices, c(item1, item2)]
+  # fit 1-factor model and extract total omega
+  psych::omega(samp, nfactors = 1, plot = FALSE)$omega.tot
+}
 
-# Loop through each pair and calculate Cronbach's alpha and Spearman-Brown with confidence intervals
+# Prepare results data frame
+results <- data.frame(
+  Pair                      = character(),
+  Alpha_Estimate            = numeric(), Alpha_CI_Lower = numeric(), Alpha_CI_Upper = numeric(),
+  Spearman_Brown_Estimate   = numeric(), SB_CI_Lower    = numeric(), SB_CI_Upper    = numeric(),
+  Omega_Estimate            = numeric(), Omega_CI_Lower = numeric(), Omega_CI_Upper = numeric(),
+  stringsAsFactors = FALSE
+)
+
+# Loop through each pair and bootstrap all three metrics
 for (pair in pairs) {
-  item1 <- pair[1]
-  item2 <- pair[2]
+  item1 <- pair[1]; item2 <- pair[2]
+  pair_name <- paste(item1, item2, sep = "_")
   
-  # Bootstrapping for Cronbach's alpha
-  alpha_boot <- boot(data = data, statistic = cronbach_alpha_fn, R = num_bootstrap, item1 = item1, item2 = item2)
-  alpha_estimate <- alpha_boot$t0
-  alpha_ci <- boot.ci(alpha_boot, type = "perc")$percent[4:5]
+  # Cronbach's alpha bootstrap
+  alpha_boot <- boot(data = merged_hexad, statistic = cronbach_alpha_fn,
+                     R = 10000, item1 = item1, item2 = item2)
+  alpha_est <- alpha_boot$t0
+  alpha_ci  <- boot.ci(alpha_boot, type = "perc")$percent[4:5]
   
-  # Bootstrapping for Spearman-Brown
-  sb_boot <- boot(data = data, statistic = spearman_brown_fn, R = num_bootstrap, item1 = item1, item2 = item2)
-  sb_estimate <- sb_boot$t0
-  sb_ci <- boot.ci(sb_boot, type = "perc")$percent[4:5]
+  # Spearman-Brown bootstrap
+  sb_boot <- boot(data = merged_hexad, statistic = spearman_brown_fn,
+                  R = 10000, item1 = item1, item2 = item2)
+  sb_est <- sb_boot$t0
+  sb_ci  <- boot.ci(sb_boot, type = "perc")$percent[4:5]
   
-  # Append results to the data frame
+  # McDonald's omega bootstrap
+  omega_boot <- boot(data = merged_hexad, statistic = mcdonald_omega_fn,
+                     R = 10000, item1 = item1, item2 = item2)
+  omega_est <- omega_boot$t0
+  omega_ci  <- boot.ci(omega_boot, type = "perc")$percent[4:5]
+  
+  # Append to results
   results <- rbind(results, data.frame(
-    Pair = paste(item1, item2, sep = "_"),
-    Alpha_Estimate = round(alpha_estimate,2),
-    Alpha_CI_Lower = round(alpha_ci[1],2),
-    Alpha_CI_Upper = round(alpha_ci[2],2),
-    Spearman_Brown_Estimate = round(sb_estimate,2),
-    SB_CI_Lower = round(sb_ci[1],2),
-    SB_CI_Upper = round(sb_ci[2],2)
+    Pair                    = pair_name,
+    Alpha_Estimate          = round(alpha_est,  2),
+    Alpha_CI_Lower          = round(alpha_ci[1], 2),
+    Alpha_CI_Upper          = round(alpha_ci[2], 2),
+    Spearman_Brown_Estimate = round(sb_est,     2),
+    SB_CI_Lower             = round(sb_ci[1],  2),
+    SB_CI_Upper             = round(sb_ci[2],  2),
+    Omega_Estimate          = round(omega_est,  2),
+    Omega_CI_Lower          = round(omega_ci[1], 2),
+    Omega_CI_Upper          = round(omega_ci[2], 2)
   ))
 }
 
-# Define row names
-row_names <- c("Philanthropist", "Socializer", "Achiever", "Player", "Disruptor", "Free Spirit")
+# Print the results
 
-# Add row names to the results data frame
-results <- cbind(Row = row_names, results)
 
-# Display the results in an RMarkdown-friendly table
-results %>%
-  kbl(caption = "Reliability Analysis: Cronbach's Alpha and Spearman-Brown Results") %>%
-  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+kable(results, caption = "Internal reliability, Composite Reliability (CR) estimates, and Average Variance Extracted (AVE) for each Hexad-12 scale. ",digits  = 2)
 
 
 ```
+
+
+
 ## Correlaiton metric Kendals Tau
 ```{r}
 
@@ -714,3 +810,96 @@ cor_matrix_df %>%
 
 ```
 
+# Item by Item Analysis
+```{r}
+# Required packages
+library(psych)       # describe(), alpha(), omega()
+library(lavaan)      # cfa()
+library(semTools)    # omegaSem()
+library(ggplot2)     # plotting
+library(dplyr)       # data wrangling
+library(purrr)       # map*
+
+# Define your 12 item columns
+item_cols <- c("A2","A4","D3","D4","F1","F3","P1","P4","R2","R4","S2","S4")
+df_items  <- merged_hexad[ , item_cols ]
+
+# 1. Descriptive statistics
+desc_stats <- describe(df_items)
+
+kable(desc_stats, caption = "Summary Statistics per item",digits  = 2)
+
+
+# 2. Item–total correlations
+merged_hexad$total_score <- rowSums(df_items, na.rm=TRUE)
+item_total_corrs <- map_dbl(item_cols, ~ cor(
+  merged_hexad[[.x]],
+  merged_hexad$total_score - merged_hexad[[.x]],
+  use = "pairwise.complete.obs"
+))
+names(item_total_corrs) <- item_cols
+
+
+
+kable(item_total_corrs, caption = "Item–total correlation for each subscale",digits  = 2)
+
+
+
+```
+
+
+
+```{r}
+# install.packages(c("ggplot2","diptest","tidyr","dplyr","purrr"))
+library(ggplot2)
+library(diptest)
+library(tidyr)
+library(dplyr)
+library(purrr)
+
+# 1. Define your 12 item columns and subset
+item_cols <- c("A2","A4","D3","D4","F1","F3","P1","P4","R2","R4","S2","S4")
+df_items <- merged_hexad[, item_cols]
+
+# 2. Reshape to long format for plotting
+df_long <- df_items %>%
+  pivot_longer(cols      = everything(),
+               names_to  = "item",
+               values_to = "score")
+
+# 3. Faceted histograms
+ggplot(df_long, aes(x = score)) +
+  geom_histogram(bins = 30, color = "black", fill = "lightblue") +
+  facet_wrap(~ item, scales = "free") +
+  labs(title = "Hexad-12 Item Distributions",
+       x     = "Response",
+       y     = "Count") +
+  theme_minimal()
+
+
+```
+
+```{r}
+
+#––– 1. Load libraries
+library(moments)    # for skewness() and kurtosis()
+library(multimode)  # for silverman.test()
+library(dplyr)      # for data manipulation
+library(tidyr)      # if you later want to reshape for plots
+library(purrr)      # for map functions
+library(ggplot2)    # for any plotting
+
+
+for(it in item_cols) {
+  x <- na.omit(merged_hexad[[it]])
+  # Silverman’s test (mod0=1 ⇒ test unimodality vs. multimodality)
+  si <- modetest(x, mod0 = 1, method = "SI", B = 10000)
+  
+  cat(sprintf(
+    "%-3s  bw = %.3f  p = %.3f\n",
+    it,
+    si$statistic,   # critical bandwidth
+    si$p.value      # p-value
+  ))
+}
+```
